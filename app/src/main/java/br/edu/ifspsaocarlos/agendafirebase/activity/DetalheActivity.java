@@ -45,7 +45,7 @@ public class DetalheActivity extends AppCompatActivity implements AdapterView.On
         spinner = (Spinner) findViewById(R.id.spinner);
         final List<String> categorias = new ArrayList<String>();
         categorias.add("Amigo");
-        categorias.add("Família");
+        categorias.add("Familia");
         categorias.add("Trabalho");
         categorias.add("Outro");
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
