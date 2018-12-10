@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -40,7 +39,7 @@ import br.edu.ifspsaocarlos.agendafirebase.adapter.ContatoAdapter;
 import br.edu.ifspsaocarlos.agendafirebase.model.Contato;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
 
     private RecyclerView recyclerView;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity{
         if (!searchView.isIconified()) {
 
             searchView.onActionViewCollapsed();
-            updateUI(null);
+            updateUI(null, null);
 
         } else {
             super.onBackPressed();
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity{
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
 
-            updateUI(query);
+            updateUI(query, null);
             searchView.clearFocus();
 
         }
@@ -95,13 +94,13 @@ public class MainActivity extends AppCompatActivity{
         Intent intent = getIntent();
         handleIntent(intent);
 
-        empty= (TextView) findViewById(R.id.empty_view);
+        empty = (TextView) findViewById(R.id.empty_view);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
-        progressBar=(ProgressBar)findViewById(R.id.progressbar);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
 
 
@@ -117,8 +116,8 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-            progressBar.setVisibility(View.GONE);
-            if (dataSnapshot.getChildrenCount()==0)
+                progressBar.setVisibility(View.GONE);
+                if (dataSnapshot.getChildrenCount() == 0)
                     empty.setVisibility(View.VISIBLE);
                 else
                     empty.setVisibility(View.GONE);
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity{
         });
 
 
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,10 +139,8 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        updateUI(null);
+        updateUI(null, null);
         setupRecyclerView();
-
-
 
 
     }
@@ -155,23 +152,22 @@ public class MainActivity extends AppCompatActivity{
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.pesqContato).getActionView();
 
-        ImageView closeButton = (ImageView)searchView.findViewById(R.id.search_close_btn);
+        ImageView closeButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
 
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText et = (EditText)findViewById(R.id.search_src_text);
+                EditText et = (EditText) findViewById(R.id.search_src_text);
                 if (et.getText().toString().isEmpty())
                     searchView.onActionViewCollapsed();
 
                 searchView.setQuery("", false);
 
-                updateUI(null);
+                updateUI(null, null);
 
             }
         });
-
 
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -192,7 +188,6 @@ public class MainActivity extends AppCompatActivity{
             }
 
 
-
         if (requestCode == 2) {
             if (resultCode == RESULT_OK)
                 showSnackBar(getResources().getString(R.string.contato_alterado));
@@ -204,20 +199,18 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void showSnackBar(String msg) {
-        CoordinatorLayout coordinatorlayout= (CoordinatorLayout)findViewById(R.id.coordlayout);
+        CoordinatorLayout coordinatorlayout = (CoordinatorLayout) findViewById(R.id.coordlayout);
         Snackbar.make(coordinatorlayout, msg,
                 Snackbar.LENGTH_LONG)
                 .show();
     }
 
 
+    private void updateUI(String nomeContato, String tipoContato) {
 
-    private void updateUI(String nomeContato)
-    {
-
-        if (nomeContato==null) {
-             query= databaseReference.orderByChild("nome");
-             options = new FirebaseRecyclerOptions.Builder<Contato>().setQuery(query, Contato.class).build();
+        if (nomeContato == null) {
+            query = databaseReference.orderByChild("nome");
+            options = new FirebaseRecyclerOptions.Builder<Contato>().setQuery(query, Contato.class).build();
 
             adapter = new ContatoAdapter(options);
             recyclerView.setAdapter(adapter);
@@ -226,22 +219,16 @@ public class MainActivity extends AppCompatActivity{
 
             empty.setText(getResources().getString(R.string.lista_vazia));
             fab.show();
+        } else {
+            if(tipoContato == null) {
+                query = databaseReference.orderByChild("nome").startAt(nomeContato).endAt(nomeContato.concat("\uf8ff"));
+            } else {
+                query = databaseReference.orderByChild("tipoContato").equalTo(tipoContato);
+            }
         }
-        else {
-
-
-             //EXERCICIO: insira aqui o código para buscar somente os contatos que atendam
-            //           ao criterio de busca digitado pelo usuário na SearchView.
-
-
-
-        }
-
-     }
+    }
 
     private void setupRecyclerView() {
-
-
         adapter.setClickListener(new ContatoAdapter.ItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -250,7 +237,6 @@ public class MainActivity extends AppCompatActivity{
                 startActivityForResult(i, 2);
             }
         });
-
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override
@@ -266,7 +252,6 @@ public class MainActivity extends AppCompatActivity{
 
                 }
             }
-
 
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
@@ -288,30 +273,19 @@ public class MainActivity extends AppCompatActivity{
                 }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
-
-
-
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-
     }
-
-
 
     protected void onStart() {
         super.onStart();
         adapter.startListening();
-
-
     }
 
     protected void onResume() {
         super.onResume();
         adapter.startListening();
-
-
     }
 
     protected void onStop() {
@@ -319,6 +293,4 @@ public class MainActivity extends AppCompatActivity{
         adapter.stopListening();
 
     }
-
-
 }
