@@ -210,15 +210,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (nomeContato == null) {
             query = databaseReference.orderByChild("nome");
-            options = new FirebaseRecyclerOptions.Builder<Contato>().setQuery(query, Contato.class).build();
-
-            adapter = new ContatoAdapter(options);
-            recyclerView.setAdapter(adapter);
-            adapter.startListening();
-
-
-            empty.setText(getResources().getString(R.string.lista_vazia));
-            fab.show();
         } else {
             if(tipoContato == null) {
                 query = databaseReference.orderByChild("nome").startAt(nomeContato).endAt(nomeContato.concat("\uf8ff"));
@@ -226,6 +217,13 @@ public class MainActivity extends AppCompatActivity {
                 query = databaseReference.orderByChild("tipoContato").equalTo(tipoContato);
             }
         }
+
+        options = new FirebaseRecyclerOptions.Builder<Contato>().setQuery(query, Contato.class).build();
+        adapter = new ContatoAdapter(options);
+        recyclerView.setAdapter(adapter);
+        adapter.startListening();
+        empty.setText(getResources().getString(R.string.lista_vazia));
+        fab.show();
     }
 
     private void setupRecyclerView() {
