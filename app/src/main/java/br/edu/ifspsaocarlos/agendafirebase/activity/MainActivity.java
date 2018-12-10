@@ -20,6 +20,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -178,6 +179,29 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.todos:
+                updateUI(null, null);
+                return true;
+            case R.id.amigos:
+                updateUI(null, "Amigos");
+                return true;
+            case R.id.familia:
+                updateUI(null, "Familia");
+                return true;
+            case R.id.trabalho:
+                updateUI(null, "Trabalho");
+                return true;
+            case R.id.outro:
+                updateUI(null, "Outro");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -208,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(String nomeContato, String tipoContato) {
 
-        if (nomeContato == null) {
+        if (nomeContato == null && tipoContato == null) {
             query = databaseReference.orderByChild("nome");
         } else {
             if(tipoContato == null) {
